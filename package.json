@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "@hapi/hapi": "^20.0.1",
+    "@octokit/rest": "^18.0.6",
+    "parcel": "^2.0.0-beta.1"
+  },
+  "template": {
+    "extends": [
+      "nodeEslint",
+      "parcelEslint"
+    ],
+    "parcel": {
+      "entries": [
+        "public/index.pug"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "mocha -A",
+    "cov": "nyc mocha",
+    "lint": "eslint .",
+    "fix": "eslint --fix .",
+    "start": "parcel serve public/index.pug  ",
+    "build": "rm -rf dist && parcel build public/index.pug  "
+  },
+  "devDependencies": {
+    "eslint": "*",
+    "eslint-config-ipfs": "*",
+    "eslint-config-oclif": "*",
+    "mkgs-tool": "^0.1.12",
+    "mocha": "*",
+    "nyc": "*"
+  }
+}
