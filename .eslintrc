@@ -14,6 +14,7 @@
     "oclif"
   ],
   "rules": {
-    "no-await-in-loop": "off"
+    "no-await-in-loop": "off",
+    "strict": 0
   }
 }
