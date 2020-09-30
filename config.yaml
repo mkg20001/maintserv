@@ -1,7 +1,0 @@
-api:
-  host: 127.0.0.1
-  port: 3667
-db:
-  url: 'mongodb://localhost:27017/maintserv'
-github:
-  token: 'a5d8b459310da9d1ab96fe09e962f507b2f04bdf'
