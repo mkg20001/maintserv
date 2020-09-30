@@ -16,7 +16,8 @@
     "mongoose": "^5.10.7",
     "parcel": "^2.0.0-beta.1",
     "pino": "^6.6.1",
-    "relish": "^3.0.0"
+    "relish": "^3.0.0",
+    "streaming-iterables": "^5.0.3"
   },
   "engines": {
     "node": ">=12.0.0"

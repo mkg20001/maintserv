@@ -13,6 +13,8 @@ const dlog = debug('maintserv:fetcher-gh')
 
 const yaml = require('js-yaml')
 
+const {buffer} = require('streaming-iterables')
+
 module.exports = (config, DBM, parentId) => {
   const source = config.github.source
 
@@ -109,7 +111,7 @@ module.exports = (config, DBM, parentId) => {
     try {
       maintParsed = yaml.safeLoad(maintInfo.join('\n'))
     } catch (error) {
-      dlog('%o: %s', maintInfo, error)
+      dlog('maintinfo parse error %o: %s', maintInfo, error)
     }
 
     if (maintParsed) {
@@ -148,17 +150,17 @@ module.exports = (config, DBM, parentId) => {
   async function processGHTask() { // TODO: use decrementing IDs to determine the ones in between to delete
     const existingIds = {issue: [], pr: []}
 
-    /* for await (const issue of pullIssues()) {
-      if (issue.pull_request) {
+    for await (const issue of buffer(100, pullIssues())) {
+      if (issue.pull_request) { // v3 api pulls PRs as issues, but we can filter them out
         continue
       }
 
       const {id, val} = await extractIssueMeta(issue)
       await dbUpdate(parentId, 'issue', id, val)
       existingIds.issue.push(id)
-    } */
+    }
 
-    for await (const pr of pullPRs()) {
+    for await (const pr of buffer(100, pullPRs())) {
       const {id, val} = await extractPRMeta(pr)
       await dbUpdate(parentId, 'pr', id, val)
       existingIds.pr.push(id)
