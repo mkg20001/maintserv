@@ -66,6 +66,14 @@ module.exports = (config, DBM, parentId) => {
     })
   }
 
+  function normalizeString(str) {
+    return str.replace(/\r\n/g, '\n')
+  }
+
+  function normalizeLines(str) {
+    return normalizeString(str).split('\n').map(l => l.trim())
+  }
+
   function extractIssueMeta(issue) {
     const type = issue.pull_request ? 'pr' : 'issue'
 
@@ -76,7 +84,25 @@ module.exports = (config, DBM, parentId) => {
       break
     }
     case 'issue': {
-      console.log(issue)
+      // console.log(issue)
+      const lines = normalizeLines(issue.body)
+
+      let started
+
+      const maintInfo = lines.filter(l => {
+        if (l === '```yaml') {
+          started = true
+        } else if (l === '```') {
+          started = false
+        } else if (started) {
+          return true
+        } else {
+          return false
+        }
+      })
+
+      // console.log(maintInfo)
+
       break
     }
     default: {
