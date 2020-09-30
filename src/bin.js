@@ -13,6 +13,13 @@ require('mkg-bin-gen')(
       db: Joi.object().required(),
       github: Joi.object({
         token: Joi.string().required(),
+        source: Joi.object({
+          repo: Joi.string().required(),
+          owner: Joi.string().required(),
+        }).required(),
+      }).required(),
+      hydra: Joi.object({
+        jobsets: Joi.array().items(Joi.string().pattern(/[a-z0-9.-]+@[a-z0-9]+/)).required(),
       }).required(),
     }),
   },
