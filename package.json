@@ -6,7 +6,7 @@
     "@octokit/plugin-throttling": "^3.3.1",
     "@octokit/rest": "^18.0.6",
     "catbox-mongodb": "^4.2.1",
-    "celarium": "mkg20001/celarium#dev",
+    "celarium": "github:mkg20001/celarium#dev",
     "hapi-pino": "^8.3.0",
     "hapi-sentry": "^3.1.0",
     "hapi-spa-serve": "^0.1.1",
@@ -45,5 +45,17 @@
     "mkgs-tool": "^0.1.12",
     "mocha": "*",
     "nyc": "*"
-  }
+  },
+  "name": "maintserv",
+  "description": "A service for maintainers to get a quicker overview of their nixpkgs packages",
+  "version": "0.0.1",
+  "main": "index.js",
+  "keywords": [
+    "nixos",
+    "nixpkgs",
+    "maintaince",
+    "service"
+  ],
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MPL-2.0"
 }
