@@ -48,7 +48,7 @@
   },
   "name": "maintserv",
   "description": "A service for maintainers to get a quicker overview of their nixpkgs packages",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "keywords": [
     "nixos",
