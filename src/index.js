@@ -46,7 +46,7 @@ const init = async config => {
   } = await celarium('node:' + require.resolve('./celarium'), {db: 'mongoose', api: 'hapi', beautify: false}, {db: config.db, api: config.api})
 
   const fetcher = await Fetcher(config, DBM, null)
-  fetcher.processIssuesTask()
+  fetcher.processGHTask()
 
   const server = API._hapi
 

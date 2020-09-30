@@ -66,6 +66,14 @@ module.exports = (config, DBM, parentId) => {
     })
   }
 
+  function pullPRs() {
+    return paginateOctokit(octokit.pulls.list, {
+      owner: 'nixos',
+      repo: 'nixpkgs',
+      state: 'open',
+    })
+  }
+
   function normalizeString(str) {
     return str.replace(/\r\n/g, '\n')
   }
@@ -74,46 +82,56 @@ module.exports = (config, DBM, parentId) => {
     return normalizeString(str).split('\n').map(l => l.trim())
   }
 
-  function extractIssueMeta(issue) {
-    const type = issue.pull_request ? 'pr' : 'issue'
-
+  async function extractIssueMeta(issue) {
     const val = {}
 
-    switch (type) {
-    case 'pr': {
-      break
-    }
-    case 'issue': {
-      // console.log(issue)
-      const lines = normalizeLines(issue.body)
+    const lines = normalizeLines(issue.body)
 
-      let started
+    let started
 
-      const maintInfo = lines.filter(l => {
-        if (l === '```yaml') {
-          started = true
-        } else if (l === '```') {
-          started = false
-        } else if (started) {
-          return true
-        } else {
-          return false
-        }
-      })
+    const maintInfo = lines.filter(l => {
+      if (l === '```yaml') {
+        started = true
+      } else if (l === '```') {
+        started = false
+      } else if (started) {
+        return true
+      } else {
+        return false
+      }
+    })
 
-      // console.log(maintInfo)
+    console.log(maintInfo)
 
-      break
-    }
-    default: {
-      throw new TypeError(type)
-    }
-    }
-
-    // TODO: this gives us either an issue OR a PR
     return {
       id: issue.id,
-      type,
+      val,
+    }
+  }
+
+  async function extractPRMeta(issue) {
+    const val = {}
+
+    const lines = normalizeLines(issue.body)
+
+    let started
+
+    const maintInfo = lines.filter(l => {
+      if (l === '```yaml') {
+        started = true
+      } else if (l === '```') {
+        started = false
+      } else if (started) {
+        return true
+      } else {
+        return false
+      }
+    })
+
+    console.log(maintInfo)
+
+    return {
+      id: issue.id,
       val,
     }
   }
@@ -126,16 +144,23 @@ module.exports = (config, DBM, parentId) => {
   // TODO: clear up all non-existing ids in parent
   }
 
-  async function processIssuesTask() {
-    const src = pullIssues()
-
+  async function processGHTask() { // TODO: use decrementing IDs to determine the ones in between to delete
     const existingIds = {issue: [], pr: []}
 
-    for await (const issue of src) {
-      const {id, val, type} = extractIssueMeta(issue)
-      // TODO: split up PRs and issues since we're pulling both
-      await dbUpdate(parentId, type, id, val)
-      existingIds[type].push(id)
+    for await (const issue of pullIssues()) {
+      if (issue.pull_request) {
+        continue
+      }
+
+      const {id, val} = await extractIssueMeta(issue)
+      await dbUpdate(parentId, 'issue', id, val)
+      existingIds.issue.push(id)
+    }
+
+    for await (const pr of pullPRs()) {
+      const {id, val} = await extractPRMeta(pr)
+      await dbUpdate(parentId, 'pr', id, val)
+      existingIds.pr.push(id)
     }
 
     for (const type in existingIds) { // eslint-disable-line guard-for-in
@@ -144,6 +169,6 @@ module.exports = (config, DBM, parentId) => {
   }
 
   return {
-    processIssuesTask,
+    processGHTask,
   }
 }
